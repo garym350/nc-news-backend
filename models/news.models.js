@@ -10,14 +10,11 @@ const fetchTopics = () => {
    
     return db.query('SELECT * FROM topics')
       .then((topics) => {
-      // console.log("MODEL SENDING BACK==>", topics.rows)
       return topics.rows
   }
    )}
 
 const fetchArticleById = (article_id) => {
-
-  // console.log("MODEL ENTERED")
   
   return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]) // parameterised enquiry - not injected directly into SQL
   .then((article) => {
@@ -33,7 +30,6 @@ const fetchArticleById = (article_id) => {
 )}
 
 const fetchAllArticles = () => {
-  console.log("MODEL ENTERED")
   
   return db.query(`SELECT 
   articles.article_id,

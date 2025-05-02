@@ -29,8 +29,6 @@ const getEndpointDocs = (req, res, next) => {
     })
   }
 
-// ---------------------------------------
-
 const getArticles = (req, res, next) => {
   
   fetchAllArticles().then((articles) => {
