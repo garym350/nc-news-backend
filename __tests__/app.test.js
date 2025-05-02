@@ -83,7 +83,7 @@ describe("GET /api/topics", () => {
         });
     });
 
-test.skip("400: Responds with bad request when given invalid path", () => {
+test("400: Responds with bad request when given invalid path", () => {
       return request(app)
         .get("/api/articles/notANumber")
         .expect(400)
@@ -91,7 +91,7 @@ test.skip("400: Responds with bad request when given invalid path", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
-    test.skip("404: Responds with custom message when given a number not in database", () => {
+    test("404: Responds with custom message when given a number not in database", () => {
       return request(app)
         .get("/api/articles/999999")
         .expect(404)
