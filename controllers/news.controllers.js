@@ -12,25 +12,22 @@ const getEndpointDocs = (req, res, next) => {
   };
 
   const getTopics = (req, res, next) => {
-    
     return fetchTopics().then((topics) => {
         res.status(200).send({ topics })
     })
     .catch(next)
   };
 
-
   const getArticleById = (req, res, next) => {
     const articleId = req.params.article_id
     return fetchArticleById(articleId)
     .then((article) => {
-  
         res.status(200).send({ article })
     })
-    .catch(next)
-}
-
-// ---------------------------------------
+    .catch((err) => {
+      next(err)
+    })
+  }
 
 const getArticles = (req, res, next) => {
   

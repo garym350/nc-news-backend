@@ -10,27 +10,29 @@ const fetchTopics = () => {
    
     return db.query('SELECT * FROM topics')
       .then((topics) => {
-      // console.log("MODEL SENDING BACK==>", topics.rows)
       return topics.rows
   }
    )}
 
 const fetchArticleById = (article_id) => {
-
-  // console.log("MODEL ENTERED")
   
   return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]) // parameterised enquiry - not injected directly into SQL
   .then((article) => {
-    // console.log(article.rows, "<=== ARTICLE RETURNING FROM MODEL")
+    const retArticle = article.rows[0]
+    if (!retArticle) {
+      return Promise.reject({
+        status: 404,
+        msg: `No articles with an ID of ${article_id}`,
+      });
+    }
     return article.rows[0];
   }
 )}
 
 const fetchAllArticles = () => {
-  console.log("MODEL ENTERED")
   
   return db.query(`SELECT 
-    articles.article_id,
+  articles.article_id,
   articles.author,
   articles.title,
   articles.topic,
@@ -46,8 +48,6 @@ ORDER BY articles.created_at DESC;`)
     
     return articles.rows;
   }
-
-
 )}
 
 module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles }
