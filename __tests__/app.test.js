@@ -9,7 +9,7 @@ const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const app = require("../app");
-const { forEach } = require("../db/data/test-data/articles");
+// const { forEach } = require("../db/data/test-data/articles");
 
 /* Set up your beforeEach & afterAll functions here */
 
@@ -126,3 +126,88 @@ test("400: Responds with bad request when given invalid path", () => {
         });
     });
   });
+
+  //------------------------
+
+  describe("GET /api/articles/:articles id/comments", () => {
+    test("200: Responds with an array of article objects", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.length).toBe(11);
+          expect(body).toBeSortedBy("created_at", {
+            descending: true,
+          });
+          body.forEach((article) => {
+            expect(article).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            });
+          });
+        });
+    });
+    test("400: Responds with bad request when given invalid path", () => {
+      return request(app)
+        .get("/api/articles/notAnumber/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("404: Responds with custom message when given a number not in database", () => {
+      return request(app)
+        .get("/api/articles/999999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No comments with an article Id of 999999");
+        });
+    });
+  });
+
+  // ------------------------ POSTS -----------------------------------
+
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("Responds with the posted comment", () => {
+      const commentToPost = {username: "butter_bridge", body: "This is a comment"}
+      return request(app)
+      .post("/api/articles/1/comments")
+      .send(commentToPost)
+      .expect(201)
+        .then(({ body }) =>{
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            created_at: expect.any(String)
+          }
+          )
+        })
+      })
+      test("404: Responds with Bad Request Error if user is not in user database", () => {
+        const commentToPost = {username: "NoName", body: "This is a comment"}
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send(commentToPost)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('User NoName does not exist');
+          });
+      });
+      test("404: Responds with Bad Request if article number does not exist", () => {
+        const commentToPost = {username: "butter_bridge", body: "This is a comment"}
+        return request(app)
+          .post("/api/articles/9999/comments")
+          .send(commentToPost)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Article id 9999 is not valid');
+          });
+      });
+    })
+  
