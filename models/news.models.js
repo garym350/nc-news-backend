@@ -30,7 +30,6 @@ const fetchArticleById = (article_id) => {
 )}
 
 const fetchAllArticles = () => {
-  
   return db.query(`SELECT 
   articles.article_id,
   articles.author,
@@ -45,9 +44,53 @@ LEFT JOIN comments ON articles.article_id = comments.article_id
 GROUP BY articles.article_id
 ORDER BY articles.created_at DESC;`) 
   .then((articles) => {
-    
     return articles.rows;
   }
 )}
 
-module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles }
+const fetchAllCommentsByArticleId = (article_id) => {
+  return db.query(`SELECT
+    comment_id,
+    votes,
+    created_at,
+    author,
+    body,
+    article_id
+    FROM comments WHERE article_id = $1
+    ORDER BY created_at DESC`,[article_id])
+    .then((comments)=>{
+      if (comments.rows.length === 0){
+        return Promise.reject({status:404, msg: `No comments with an article Id of ${article_id}`})
+      }
+      return comments.rows;
+      })
+}
+
+ 
+const postNewComment = (req) => {
+  const article_id = req.params.article_id
+  const userName = req.body.username
+  const commentBody = req.body.body
+
+return db.query(`SELECT * FROM users WHERE username = $1`, [userName])
+.then((users) => {
+  if(users.rows.length === 0){
+    return Promise.reject( {status:404, msg: `User ${userName} does not exist`})
+  }
+
+  return db.query(`INSERT INTO comments(article_id, body, author)
+    VALUES ($1, $2, $3)
+    RETURNING *`, [article_id, commentBody, userName])
+  .then((comments)=>{
+    return comments.rows[0]
+  })
+  .catch((err)=>{
+    if(err.code === "23503"){
+      return Promise.reject( {status: 404, msg: `Article id ${article_id} is not valid`})
+    }
+      return Promise.reject({ status: 404, msg: `Bad Request`})
+    })
+  })
+}
+
+module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment }
