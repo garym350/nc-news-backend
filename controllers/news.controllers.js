@@ -2,7 +2,9 @@ const {
     getEndpointDocumentation,
     fetchTopics,
     fetchArticleById,
-    fetchAllArticles
+    fetchAllArticles,
+    fetchAllCommentsByArticleId,
+    postNewComment
   } = require("../models/news.models.js");
 
 const getEndpointDocs = (req, res, next) => {
@@ -30,11 +32,33 @@ const getEndpointDocs = (req, res, next) => {
   }
 
 const getArticles = (req, res, next) => {
-  
-  fetchAllArticles().then((articles) => {
-    
-    res.status(200).send({ articles })
-  })
+  return fetchAllArticles()
+    .then((articles) => { 
+      res.status(200).send({ articles })
+    })
+      .catch((err)=>{
+      next(err)
+    })
 }
 
-module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles} // export above functions for use in controller
+const getCommentsByArticleId = (req, res, next) => {
+    fetchAllCommentsByArticleId(req.params.article_id)
+    .then((comments) => {
+      res.status(200).send(comments)}
+    ) 
+    .catch((err) => {
+      next(err)
+    })
+} 
+
+const postComment = (req, res, next) => {
+  postNewComment(req)
+    .then((commentReturned)=>{
+      res.status(201).send({ comment: commentReturned })
+    })
+    .catch((err) => {
+      next(err)
+    })
+  }
+
+module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles, getCommentsByArticleId, postComment} // export above functions for use in controller
