@@ -216,16 +216,19 @@ describe("GET /api/topics", () => {
       });
 
     })
-    //   test("404: Responds with Bad Request if article number does not exist", () => {
-    //     const commentToPost = {username: "butter_bridge", body: "This is a comment"}
-    //     return request(app)
-    //       .post("/api/articles/9999/comments")
-    //       .send(commentToPost)
-    //       .expect(404)
-    //       .then(({ body }) => {
-    //         expect(body.msg).toBe('Article id 9999 is not valid');
-    //       });
-    //   });
-    // })
+    
+    //---- DELETE
+
+     describe("DELETE /api/comments/:comment_id", () => {
+    test("Responds with the comment with updated votes", () => {
+      return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+        .then((result) =>{
+          expect(result.body).toEqual({})
+        })
+        })
+      })
+
   
   

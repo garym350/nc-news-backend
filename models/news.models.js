@@ -106,4 +106,18 @@ const increaseArticleVotes = (articleId, votes) =>{
     })
 }
 
-module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment, increaseArticleVotes }
+
+const eraseComment = (commentId) => {
+  console.log("model entered")
+  return db.query(`DELETE FROM comments
+                  WHERE comment_id = $1
+                  RETURNING *;`,[commentId])
+    .then(()=>{
+      return;
+    })
+    .catch((err)=>{
+      return Promise.reject( { status: 404, msg: 'Comment not deleted'})
+    })
+
+}
+module.exports = { eraseComment, getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment, increaseArticleVotes }
