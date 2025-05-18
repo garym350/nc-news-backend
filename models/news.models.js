@@ -93,4 +93,17 @@ return db.query(`SELECT * FROM users WHERE username = $1`, [userName])
   })
 }
 
-module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment }
+const increaseArticleVotes = (articleId, votes) =>{
+  return db.query(`UPDATE articles
+                    SET votes = votes + $2
+                    WHERE article_id = $1
+                    RETURNING *;`,[articleId, votes])
+    .then((article)=>{
+      return article.rows[0];
+    })
+    .catch((err)=>{
+      return Promise.reject( { status: 404, msg: 'Article votes not updated'})
+    })
+}
+
+module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment, increaseArticleVotes }

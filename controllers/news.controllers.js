@@ -4,7 +4,8 @@ const {
     fetchArticleById,
     fetchAllArticles,
     fetchAllCommentsByArticleId,
-    postNewComment
+    postNewComment,
+    increaseArticleVotes
   } = require("../models/news.models.js");
 
 const getEndpointDocs = (req, res, next) => {
@@ -61,4 +62,16 @@ const postComment = (req, res, next) => {
     })
   }
 
-module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles, getCommentsByArticleId, postComment} // export above functions for use in controller
+  const updateArticleVotes = (req, res, next) => {
+ 
+    const article_id = req.params.article_id;
+    increaseArticleVotes(article_id, req.body.inc_votes)
+    .then((articleReturned)=>{
+      res.status(200).send({articleReturned})
+    })
+    .catch((err)=>{
+      next (err)
+    })
+  }
+
+module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles, getCommentsByArticleId, postComment, updateArticleVotes} // export above functions for use in controller

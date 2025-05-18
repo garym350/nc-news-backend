@@ -9,7 +9,6 @@ const request = require("supertest");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const app = require("../app");
-// const { forEach } = require("../db/data/test-data/articles");
 
 /* Set up your beforeEach & afterAll functions here */
 
@@ -33,17 +32,6 @@ describe("GET /api", () => {
       });
   });
 });
-
-// describe("GET /api/invalidURL", () => {
-//   test("404: Not - found when given an invalid url", () => {
-//     return request(app)
-//       .get("/api/invalidURL")
-//       .expect(404)
-//       .then(({ body }) => {
-//         expect(body.msg).toBe("Not Found");
-//       });
-//   });
-// });
 
 
 //----------------------
@@ -87,14 +75,7 @@ describe("GET /api/topics", () => {
         });
     });
 
-// test("400: Responds with bad request when given invalid path", () => {
-//       return request(app)
-//         .get("/api/articles/notANumber")
-//         .expect(400)
-//         .then(({ body }) => {
-//           expect(body.msg).toBe("Bad Request");
-//         });
-//     });
+
     test("404: Responds with custom message when given a number not in database", () => {
       return request(app)
         .get("/api/articles/999999")
@@ -154,14 +135,7 @@ describe("GET /api/topics", () => {
           });
         });
     });
-    // test("400: Responds with bad request when given invalid path", () => {
-    //   return request(app)
-    //     .get("/api/articles/notAnumber/comments")
-    //     .expect(400)
-    //     .then(({ body }) => {
-    //       expect(body.msg).toBe("Bad Request");
-    //     });
-    // });
+    
     test("404: Responds with custom message when given a number not in database", () => {
       return request(app)
         .get("/api/articles/999999/comments")
@@ -214,4 +188,44 @@ describe("GET /api/topics", () => {
           });
       });
     })
+
+
+    //----- PATCH ------
+
+    describe("PATCH /api/articles/:article_id", () => {
+    test("Responds with the comment with updated votes", () => {
+      const votesUpdate = { inc_votes: 6 }
+      return request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(200)
+        .then((result) =>{
+          expect(result.body.articleReturned.votes).toBe(106)
+        })
+        })
+    
+      test("404: Responds with Bad Request Error if user is not in user database", () => {
+        const commentToPost = {username: "NoName", body: "This is a comment"}
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send(commentToPost)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('User NoName does not exist');
+          });
+      });
+
+    })
+    //   test("404: Responds with Bad Request if article number does not exist", () => {
+    //     const commentToPost = {username: "butter_bridge", body: "This is a comment"}
+    //     return request(app)
+    //       .post("/api/articles/9999/comments")
+    //       .send(commentToPost)
+    //       .expect(404)
+    //       .then(({ body }) => {
+    //         expect(body.msg).toBe('Article id 9999 is not valid');
+    //       });
+    //   });
+    // })
+  
   
