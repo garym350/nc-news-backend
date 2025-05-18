@@ -93,4 +93,34 @@ return db.query(`SELECT * FROM users WHERE username = $1`, [userName])
   })
 }
 
-module.exports = { getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment }
+const increaseArticleVotes = (articleId, votes) =>{
+  return db.query(`UPDATE articles
+                    SET votes = votes + $2
+                    WHERE article_id = $1
+                    RETURNING *;`,[articleId, votes])
+    .then((article)=>{
+      return article.rows[0];
+    })
+    .catch((err)=>{
+      return Promise.reject( { status: 404, msg: 'Article votes not updated'})
+    })
+}
+
+const eraseComment = (commentId) => {
+  console.log("model entered")
+  return db.query(`DELETE FROM comments
+                  WHERE comment_id = $1
+                  RETURNING *;`,[commentId])
+    .then((deletedComments)=>{
+      if (deletedComments.rows.length === 0){
+      return Promise.reject({ status:404, msg: `Comment with Id ${commentId} not found` }
+      )}
+      return;
+    })
+    .catch((err)=>{
+      return Promise.reject(err);
+    })
+}
+
+
+module.exports = { eraseComment, getEndpointDocumentation, fetchTopics, fetchArticleById, fetchAllArticles, fetchAllCommentsByArticleId, postNewComment, increaseArticleVotes }

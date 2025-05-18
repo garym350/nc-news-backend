@@ -4,7 +4,9 @@ const {
     getArticleById,
     getArticles, 
     getCommentsByArticleId,
-    postComment
+    postComment,
+    updateArticleVotes,
+    deleteComment
     } = require("./controllers/news.controllers");
   
     const express = require("express")
@@ -17,7 +19,9 @@ const {
     app.get('/api/articles/:article_id', getArticleById)
     app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
     app.post('/api/articles/:article_id/comments', postComment)
-    
+    app.patch('/api/articles/:article_id', updateArticleVotes)
+    app.delete('/api/comments/:comment_id', deleteComment)
+
     // /api/article/1/comments
 
     app.use((err, req, res, next) => {
@@ -31,12 +35,6 @@ const {
           res.status(400).send({ msg: "Bad Request" });
         } else next(err);
       });
-
-      // app.use((err, req, res, next) => {
-      //   if (err.code === "23503") {
-      //     res.status(400).send({ msg: "Bad Request" });
-      //   } else next(err);
-      // });
 
     app.use((err, req, res, next) => {
         res.status(500).send({ msg: "Server Error!"});
