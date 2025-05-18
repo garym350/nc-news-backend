@@ -23,16 +23,6 @@ const getEndpointDocs = (req, res, next) => {
     .catch(next)
   };
 
-//   const getArticles = (req, res, next) => {
-//   return fetchAllArticles()
-//     .then((articles) => { 
-//       res.status(200).send({ articles })
-//     })
-//       .catch((err)=>{
-//       next(err)
-//     })
-// }
-
 const getUsers = (req, res, next) => {
   return fetchAllUsers()
   .then((users)=>{
@@ -89,8 +79,6 @@ const postComment = (req, res, next) => {
 };
 
 
-//---------------------------------------
-
   const deleteComment = (req, res, next) => {
     return eraseComment(req.params.comment_id)
     .then(()=>{
@@ -100,8 +88,6 @@ const postComment = (req, res, next) => {
       next (err)
     })
   }
-
-  //----------------------------
 
   const getArticlesSorted = (req, res, next) => {
   const { sort_by, order } = req.query;

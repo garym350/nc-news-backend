@@ -103,14 +103,11 @@ describe("GET /api/topics", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               article_img_url: expect.any(String),
-              // comment_count: expect.any(Number),
             });
           });
         });
     });
   
-
-  //------------------------******
 
   describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comment objects", () => {
@@ -145,7 +142,6 @@ describe("GET /api/topics", () => {
     });
   });
 
-  // ------------------------ POSTS -----------------------------------
 
   describe("POST /api/articles/:article_id/comments", () => {
     test("Responds with the posted comment", () => {
