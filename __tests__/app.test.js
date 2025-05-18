@@ -59,7 +59,6 @@ describe("GET /api/topics", () => {
         .get("/api/articles/2")
         .expect(200)
         .then(({ body }) => {
-          console.log("Body==>", body)
           expect(body.article).toMatchObject({
             author: expect.any(String),
             title: expect.any(String),
