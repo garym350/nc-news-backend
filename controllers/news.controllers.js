@@ -2,11 +2,12 @@ const {
     getEndpointDocumentation,
     fetchTopics,
     fetchArticleById,
-    fetchAllArticles,
     fetchAllCommentsByArticleId,
     postNewComment,
     increaseArticleVotes,
-    eraseComment
+    eraseComment,
+    fetchAllUsers,
+    fetchArticlesSorted
   } = require("../models/news.models.js");
 
 const getEndpointDocs = (req, res, next) => {
@@ -22,6 +23,26 @@ const getEndpointDocs = (req, res, next) => {
     .catch(next)
   };
 
+//   const getArticles = (req, res, next) => {
+//   return fetchAllArticles()
+//     .then((articles) => { 
+//       res.status(200).send({ articles })
+//     })
+//       .catch((err)=>{
+//       next(err)
+//     })
+// }
+
+const getUsers = (req, res, next) => {
+  return fetchAllUsers()
+  .then((users)=>{
+    res.status(200).send({ users })
+  })
+  .catch((err) => {
+    next(err)
+  })
+}
+
   const getArticleById = (req, res, next) => {
     const articleId = req.params.article_id
     return fetchArticleById(articleId)
@@ -33,52 +54,45 @@ const getEndpointDocs = (req, res, next) => {
     })
   }
 
-const getArticles = (req, res, next) => {
-  return fetchAllArticles()
-    .then((articles) => { 
-      res.status(200).send({ articles })
-    })
-      .catch((err)=>{
-      next(err)
-    })
-}
 
 const getCommentsByArticleId = (req, res, next) => {
-    fetchAllCommentsByArticleId(req.params.article_id)
+    return fetchAllCommentsByArticleId(req.params.article_id)
     .then((comments) => {
-      res.status(200).send(comments)}
-    ) 
+      res.status(200).send({ comments })
+    })
     .catch((err) => {
       next(err)
     })
 } 
 
 const postComment = (req, res, next) => {
-  postNewComment(req)
-    .then((commentReturned)=>{
-      res.status(201).send({ comment: commentReturned })
-    })
-    .catch((err) => {
-      next(err)
-    })
-  }
+  const { article_id } = req.params;
+  const { username, body } = req.body;
 
-  const updateArticleVotes = (req, res, next) => {
-    const article_id = req.params.article_id;
-    increaseArticleVotes(article_id, req.body.inc_votes)
-    .then((articleReturned)=>{
-      res.status(200).send({articleReturned})
+  return postNewComment(article_id, username, body)
+    .then((commentReturned) => {
+      res.status(201).send({ comment: commentReturned });
     })
-    .catch((err)=>{
-      next (err)
+    .catch(next);
+};
+
+
+ const updateArticleVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  increaseArticleVotes(article_id, inc_votes)
+    .then((articleReturned) => {
+      res.status(200).send({ article: articleReturned });
     })
-  }
+    .catch(next);
+};
+
 
 //---------------------------------------
 
   const deleteComment = (req, res, next) => {
-    console.log("controller entered")
-    eraseComment(req.params.comment_id)
+    return eraseComment(req.params.comment_id)
     .then(()=>{
       res.status(204).send()
     })
@@ -87,4 +101,27 @@ const postComment = (req, res, next) => {
     })
   }
 
-module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles, getCommentsByArticleId, postComment, updateArticleVotes, deleteComment} // export above functions for use in controller
+  //----------------------------
+
+  const getArticlesSorted = (req, res, next) => {
+  const { sort_by, order } = req.query;
+  fetchArticlesSorted(sort_by, order)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err)=>{
+      next(err)
+    });
+};
+
+
+module.exports ={ getUsers, 
+                  getEndpointDocs, 
+                  getTopics, 
+                  getArticleById, 
+                  // getArticles, 
+                  getCommentsByArticleId, 
+                  postComment, 
+                  updateArticleVotes, 
+                  deleteComment,
+                  getArticlesSorted} // export above functions for use in controller

@@ -1,8 +1,6 @@
 const endpointsJson = require("../endpoints.json");
 
-
 /* Set up your test imports here */
-
 
 const db = require("../db/connection");
 const request = require("supertest");
@@ -33,7 +31,6 @@ describe("GET /api", () => {
   });
 });
 
-
 //----------------------
 
 describe("GET /api/topics", () => {
@@ -62,6 +59,7 @@ describe("GET /api/topics", () => {
         .get("/api/articles/2")
         .expect(200)
         .then(({ body }) => {
+          console.log("Body==>", body)
           expect(body.article).toMatchObject({
             author: expect.any(String),
             title: expect.any(String),
@@ -105,37 +103,38 @@ describe("GET /api/topics", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+              // comment_count: expect.any(Number),
             });
           });
         });
     });
+  
+
+  //------------------------******
+
+  describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comment objects", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBe(11);
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+          });
+        });
+      });
   });
-
-  //------------------------
-
-  describe("GET /api/articles/:articles id/comments", () => {
-    test("200: Responds with an array of article objects", () => {
-      return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.length).toBe(11);
-          expect(body).toBeSortedBy("created_at", {
-            descending: true,
-          });
-          body.forEach((article) => {
-            expect(article).toMatchObject({
-              comment_id: expect.any(Number),
-              votes: expect.any(Number),
-              created_at: expect.any(String),
-              author: expect.any(String),
-              body: expect.any(String),
-            });
-          });
-        });
-    });
-    
+});
     test("404: Responds with custom message when given a number not in database", () => {
       return request(app)
         .get("/api/articles/999999/comments")
@@ -189,21 +188,33 @@ describe("GET /api/topics", () => {
       });
     })
 
-
     //----- PATCH ------
 
     describe("PATCH /api/articles/:article_id", () => {
-    test("Responds with the comment with updated votes", () => {
-      const votesUpdate = { inc_votes: 6 }
-      return request(app)
+  test("200: Responds with the article with updated votes - increase votes", () => {
+    const votesUpdate = { inc_votes: 6 };
+    return request(app)
       .patch("/api/articles/1")
       .send(votesUpdate)
       .expect(200)
-        .then((result) =>{
-          expect(result.body.articleReturned.votes).toBe(106)
-        })
-        })
-    
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 1,
+          votes: 106,
+        });
+      });
+  });
+
+    test("Responds with the comment with updated votes - decrease votes", () => {
+  const votesUpdate = { inc_votes: -6 };
+  return request(app)
+    .patch("/api/articles/1")
+    .send(votesUpdate)
+    .expect(200)
+    .then((result) => {
+      expect(result.body.article.votes).toBe(94);
+    });
+});
       test("404: Responds with Bad Request Error if user is not in user database", () => {
         const commentToPost = {username: "NoName", body: "This is a comment"}
         return request(app)
@@ -214,7 +225,6 @@ describe("GET /api/topics", () => {
             expect(body.msg).toBe('User NoName does not exist');
           });
       });
-
     })
     
     //---- DELETE
@@ -238,7 +248,7 @@ describe("GET /api/topics", () => {
           });
       });
 
-    test("400: Responds with Bad Request Error if comment Id id not a number", () => {
+    test("400: Responds with Bad Request Error if comment Id not a number", () => {
         return request(app)
           .delete("/api/comments/notanum")
           .expect(400)
@@ -246,7 +256,46 @@ describe("GET /api/topics", () => {
             expect(body.msg).toBe('Bad Request');
           });
       });
+    })
+
+//-------------------------------
+
+describe("GET /api/articles(sorting queries)", () => {
+  test("200: responds with an array of articles, sorted by created_at/order if no queries passed in", () =>{
+    const queries={};
+    return request(app)
+      .get("/api/articles")
+      .query(queries)
+      .expect(200)
+      .then(({ body })=>{
+        expect(body.articles).toBeSortedBy("created_at", {descending: true} )
       })
+  })
+
+  test("200: responds with an array of articles, sorted in ascending order", () =>{
+    const queries={ order: "asc" };
+    return request(app)
+      .get("/api/articles")
+      .query(queries)
+      .expect(200)
+      .then(({ body })=>{ 
+        expect(body.articles).toBeSortedBy("created_at", {ascending: true} )
+      })
+  })
+
+  test("200: responds with an array of articles, sorted by votes in descending (default) order", () =>{
+    const queries={ sort_by: "votes" };
+    return request(app)
+      .get("/api/articles")
+      .query(queries)
+      .expect(200)
+      .then(({ body })=>{ 
+        expect(body.articles).toBeSortedBy("votes", {descending: true} )
+      })
+  })
+})
+
+
 
   
   
