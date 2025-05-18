@@ -74,16 +74,17 @@ const postComment = (req, res, next) => {
     })
   }
 
+//---------------------------------------
+
   const deleteComment = (req, res, next) => {
     console.log("controller entered")
     eraseComment(req.params.comment_id)
-    .then((ret)=>{
+    .then(()=>{
       res.status(204).send()
     })
     .catch((err)=>{
       next (err)
     })
-
   }
 
 module.exports ={ getEndpointDocs, getTopics, getArticleById, getArticles, getCommentsByArticleId, postComment, updateArticleVotes, deleteComment} // export above functions for use in controller

@@ -219,8 +219,8 @@ describe("GET /api/topics", () => {
     
     //---- DELETE
 
-     describe("DELETE /api/comments/:comment_id", () => {
-    test("Responds with the comment with updated votes", () => {
+    describe("DELETE /api/comments/:comment_id", () => {
+    test("Returns 202 for successful deletion", () => {
       return request(app)
       .delete("/api/comments/1")
       .expect(204)
@@ -228,6 +228,24 @@ describe("GET /api/topics", () => {
           expect(result.body).toEqual({})
         })
         })
+
+    test("404: Responds with Bad Request Error if comment is in database", () => {
+      return request(app)
+        .delete("/api/comments/327")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Comment with Id 327 not found');
+          });
+      });
+
+    test("400: Responds with Bad Request Error if comment Id id not a number", () => {
+        return request(app)
+          .delete("/api/comments/notanum")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
       })
 
   
