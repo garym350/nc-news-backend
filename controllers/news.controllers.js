@@ -90,8 +90,8 @@ const postComment = (req, res, next) => {
   }
 
   const getArticlesSorted = (req, res, next) => {
-  const { sort_by, order } = req.query;
-  fetchArticlesSorted(sort_by, order)
+  const { sort_by, order, topic } = req.query;
+  fetchArticlesSorted(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })

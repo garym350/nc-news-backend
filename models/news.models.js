@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const topics = require("../db/data/test-data/topics");
 
 const getEndpointDocumentation = () => {
     const docs=require("../endpoints.json")
@@ -134,7 +135,9 @@ const eraseComment = (commentId) => {
     })
 }
 
-const fetchArticlesSorted = (sort_by, order) => {
+//---------------------------------------
+
+const fetchArticlesSorted = (sort_by, order, topic) => {
   const validSortColumns = [
     "article_id",
     "title",
@@ -144,14 +147,23 @@ const fetchArticlesSorted = (sort_by, order) => {
     "votes",
     "article_img_url",
   ];
+
   const validOrderOptions = ["asc", "desc"];
+
+  return fetchTopics().then((topics)=>{
+    const validTopics=topics.map((topics)=>topics.slug)
+    
+  if (!validTopics.includes(topic)) {
+    topic=null}
   if (!validSortColumns.includes(sort_by)) {
     sort_by = "created_at";}
   if (!validOrderOptions.includes(order)) {
     order = "desc";}
   order=order.toUpperCase();
-  return db
-    .query(
+
+  const queryParams=[];
+
+  let queryString=
       `SELECT
       articles.article_id,
       articles.author,
@@ -161,14 +173,25 @@ const fetchArticlesSorted = (sort_by, order) => {
       articles.votes,
       articles.article_img_url,
       COUNT(comment_id) AS comment_count
-      FROM articles 
-      LEFT JOIN comments ON articles.article_id = comments.article_id
-      GROUP BY articles.article_id
-      ORDER BY ${sort_by} ${order};`)
+      FROM articles
+      LEFT JOIN comments ON articles.article_id = comments.article_id`
+
+    if (topic){
+      queryParams.push(topic)
+      queryString += ' WHERE articles.topic = $1'
+    }
+
+   queryString += `
+  GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order};`
+
+      return db.query(queryString, queryParams)
+
     .then((result) => {
       return result.rows;
     });
-};
+});
+}
 
 module.exports = { fetchAllUsers, 
                     eraseComment, 

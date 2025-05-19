@@ -13,21 +13,24 @@ const {
     } = require("./controllers/news.controllers");
 
     const cors = require('cors');
-    app.use(cors());
+    
   
     const express = require("express")
     const app = express()
+    app.use(cors());
     app.use(express.json());
   
     app.get("/api", getEndpointDocs)
     app.get('/api/topics', getTopics)
+    app.get('/api/articles', getArticlesSorted)
     app.get('api/users', getUsers)
     app.get('/api/articles/:article_id', getArticleById)
     app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
     app.post('/api/articles/:article_id/comments', postComment)
     app.patch('/api/articles/:article_id', updateArticleVotes)
     app.delete('/api/comments/:comment_id', deleteComment)
-    app.get('/api/articles', getArticlesSorted)
+   
+   
 
 
     app.use((err, req, res, next) => {
