@@ -24,7 +24,7 @@ const getEndpointDocs = (req, res, next) => {
   };
 
 const getUsers = (req, res, next) => {
-  console.log("USERS CONTROLLER ENTERED")
+
   return fetchAllUsers()
   .then((users)=>{
     res.status(200).send({ users })
