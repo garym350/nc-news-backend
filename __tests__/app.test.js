@@ -300,10 +300,12 @@ describe("GET /api/articles(topic query)", () => {
       .query(queries)
       .expect(200)
       .then(({ body })=>{
+        console.log(body.articles, "<===article")
         expect(Array.isArray(body.articles)).toBe(true)
         expect(body.articles.length).toBeGreaterThan(0)
         body.articles.forEach((article)=>{
         expect(article.topic).toBe("cats")
+        expect(typeof article.body).toBe("string")
       })
   })
 })
