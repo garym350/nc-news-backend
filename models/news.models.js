@@ -49,8 +49,10 @@ const fetchArticleById = (article_id) => {
 )}
 
 const fetchAllUsers = () => {
+  console.log("MODEL FOR USERS ENTERED")
   return db.query(`SELECT * FROM users`)
   .then((users) => {
+    console.log(users.rows, "<== MODEL RETURNING")
     return users.rows
   })
 }

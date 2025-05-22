@@ -106,6 +106,27 @@ describe("GET /api/topics", () => {
           });
         });
     });
+  })
+
+    ////---------------------
+
+    describe("GET /api/users", () => {
+    test("200: Responds with an array of user objects", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          // expect(body.users.length).toBe(13);
+          body.users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+        });
+    });
+  
   
 
   describe("GET /api/articles/:article_id/comments", () => {
@@ -130,7 +151,7 @@ describe("GET /api/topics", () => {
         });
       });
   });
-});
+
     test("404: Responds with custom message when given a number not in database", () => {
       return request(app)
         .get("/api/articles/999999/comments")
@@ -140,6 +161,7 @@ describe("GET /api/topics", () => {
         });
     });
   });
+})
 
 
   describe("POST /api/articles/:article_id/comments", () => {
@@ -185,7 +207,7 @@ describe("GET /api/topics", () => {
 
     //----- PATCH ------
 
-    describe("PATCH /api/articles/:article_id", () => {
+  describe("PATCH /api/articles/:article_id", () => {
   test("200: Responds with the article with updated votes - increase votes", () => {
     const votesUpdate = { inc_votes: 6 };
     return request(app)
@@ -300,7 +322,6 @@ describe("GET /api/articles(topic query)", () => {
       .query(queries)
       .expect(200)
       .then(({ body })=>{
-        console.log(body.articles, "<===article")
         expect(Array.isArray(body.articles)).toBe(true)
         expect(body.articles.length).toBeGreaterThan(0)
         body.articles.forEach((article)=>{
@@ -311,5 +332,3 @@ describe("GET /api/articles(topic query)", () => {
 })
 })
 
-  
-  

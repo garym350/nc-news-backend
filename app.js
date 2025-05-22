@@ -23,16 +23,13 @@ const {
     app.get("/api", getEndpointDocs)
     app.get('/api/topics', getTopics)
     app.get('/api/articles', getArticlesSorted)
-    app.get('api/users', getUsers)
+    app.get('/api/users', getUsers)
     app.get('/api/articles/:article_id', getArticleById)
     app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
     app.post('/api/articles/:article_id/comments', postComment)
     app.patch('/api/articles/:article_id', updateArticleVotes)
     app.delete('/api/comments/:comment_id', deleteComment)
    
-   
-
-
     app.use((err, req, res, next) => {
         if (err.status) {
           res.status(err.status).send({ msg: err.msg });
