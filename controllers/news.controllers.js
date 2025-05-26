@@ -105,10 +105,9 @@ const postComment = (req, res, next) => {
 module.exports ={ getUsers, 
                   getEndpointDocs, 
                   getTopics, 
-                  getArticleById, 
-                  // getArticles, 
+                  getArticleById,  
                   getCommentsByArticleId, 
                   postComment, 
                   updateArticleVotes, 
                   deleteComment,
-                  getArticlesSorted} // export above functions for use in controller
+                  getArticlesSorted} 
