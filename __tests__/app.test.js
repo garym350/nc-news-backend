@@ -135,6 +135,7 @@ test("400: Responds with bad request when given invalid path", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
+          console.log(body)
           expect(body.length).toBe(11);
           expect(body).toBeSortedBy("created_at", {
             descending: true,
@@ -178,6 +179,7 @@ test("400: Responds with bad request when given invalid path", () => {
       .send(commentToPost)
       .expect(201)
         .then(({ body }) =>{
+         
           expect(body.comment).toMatchObject({
             comment_id: expect.any(Number),
             article_id: expect.any(Number),
